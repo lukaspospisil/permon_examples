@@ -1,9 +1,9 @@
 # permon_examples
 
-examples of using PermonQP library (https://github.com/haplav/permon)
+examples of using PermonQP library (https://github.com/haplav/permon) with CMAKE in .cpp/.cu code
 
 Instalation:
-- install PETSc library (and set `PETSC_DIR`, `PETSC_ARC`H)
+- install PETSc library (and set `PETSC_DIR`, `PETSC_ARCH`)
 - install PermonQP library (and set `PERMON_DIR`)
 - clone repository with examples
 ```
