@@ -1,3 +1,5 @@
+# permon_examples
+
 examples of using PermonQP library (https://github.com/haplav/permon)
 
 Instalation:
