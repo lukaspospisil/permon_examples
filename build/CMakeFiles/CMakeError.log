@@ -1,0 +1,122 @@
+Performing C SOURCE FILE Test MULTIPASS_TEST_1_petsc_works_minimal failed with the following output:
+Change Dir: /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec192765223/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec192765223.dir/build.make CMakeFiles/cmTryCompileExec192765223.dir/build
+make[1]: Entering directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec192765223.dir/src.c.o
+/usr/bin/cc   -DMULTIPASS_TEST_1_petsc_works_minimal -I/home/lukas/soft/petsc-3.7.0/arch-linux2-c-debug/include -I/home/lukas/soft/petsc-3.7.0/include    -o CMakeFiles/cmTryCompileExec192765223.dir/src.c.o   -c /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/src.c
+In file included from /home/lukas/soft/petsc-3.7.0/include/petscis.h:7:0,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscvec.h:9,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscmat.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscpc.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscksp.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscsnes.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscts.h:7,
+                 from /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/src.c:3:
+/home/lukas/soft/petsc-3.7.0/include/petscsys.h:130:17: fatal error: mpi.h: No such file or directory
+compilation terminated.
+CMakeFiles/cmTryCompileExec192765223.dir/build.make:57: recipe for target 'CMakeFiles/cmTryCompileExec192765223.dir/src.c.o' failed
+make[1]: Leaving directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+make[1]: *** [CMakeFiles/cmTryCompileExec192765223.dir/src.c.o] Error 1
+Makefile:117: recipe for target 'cmTryCompileExec192765223/fast' failed
+make: *** [cmTryCompileExec192765223/fast] Error 2
+
+Return value: 1
+Source file was:
+
+static const char help[] = "PETSc test program.";
+#include <petscts.h>
+int main(int argc,char *argv[]) {
+  PetscErrorCode ierr;
+  TS ts;
+
+  ierr = PetscInitialize(&argc,&argv,0,help);CHKERRQ(ierr);
+  ierr = TSCreate(PETSC_COMM_WORLD,&ts);CHKERRQ(ierr);
+  ierr = TSSetFromOptions(ts);CHKERRQ(ierr);
+  ierr = TSDestroy(&ts);CHKERRQ(ierr);
+  ierr = PetscFinalize();CHKERRQ(ierr);
+  return 0;
+}
+
+Performing C SOURCE FILE Test MULTIPASS_TEST_2_petsc_works_allincludes failed with the following output:
+Change Dir: /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec342244573/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec342244573.dir/build.make CMakeFiles/cmTryCompileExec342244573.dir/build
+make[1]: Entering directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec342244573.dir/src.c.o
+/usr/bin/cc   -DMULTIPASS_TEST_2_petsc_works_allincludes -I/home/lukas/soft/petsc-3.7.0/include -I/home/lukas/soft/petsc-3.7.0/arch-linux2-c-debug/include -I/usr/lib/openmpi/include -I/usr/lib/openmpi/include/openmpi    -o CMakeFiles/cmTryCompileExec342244573.dir/src.c.o   -c /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/src.c
+Linking C executable cmTryCompileExec342244573
+/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTryCompileExec342244573.dir/link.txt --verbose=1
+/usr/bin/cc   -DMULTIPASS_TEST_2_petsc_works_allincludes    CMakeFiles/cmTryCompileExec342244573.dir/src.c.o  -o cmTryCompileExec342244573 -rdynamic /home/lukas/soft/petsc-3.7.0/arch-linux2-c-debug/lib/libpetsc.so -Wl,-rpath,/home/lukas/soft/petsc-3.7.0/arch-linux2-c-debug/lib 
+/usr/bin/ld: CMakeFiles/cmTryCompileExec342244573.dir/src.c.o: undefined reference to symbol 'ompi_mpi_comm_self'
+/usr/lib/libmpi.so.1: error adding symbols: DSO missing from command line
+collect2: error: ld returned 1 exit status
+CMakeFiles/cmTryCompileExec342244573.dir/build.make:89: recipe for target 'cmTryCompileExec342244573' failed
+make[1]: Leaving directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+make[1]: *** [cmTryCompileExec342244573] Error 1
+Makefile:117: recipe for target 'cmTryCompileExec342244573/fast' failed
+make: *** [cmTryCompileExec342244573/fast] Error 2
+
+Return value: 1
+Source file was:
+
+static const char help[] = "PETSc test program.";
+#include <petscts.h>
+int main(int argc,char *argv[]) {
+  PetscErrorCode ierr;
+  TS ts;
+
+  ierr = PetscInitialize(&argc,&argv,0,help);CHKERRQ(ierr);
+  ierr = TSCreate(PETSC_COMM_WORLD,&ts);CHKERRQ(ierr);
+  ierr = TSSetFromOptions(ts);CHKERRQ(ierr);
+  ierr = TSDestroy(&ts);CHKERRQ(ierr);
+  ierr = PetscFinalize();CHKERRQ(ierr);
+  return 0;
+}
+
+Performing C SOURCE FILE Test MULTIPASS_TEST_3_petsc_works_alllibraries failed with the following output:
+Change Dir: /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTryCompileExec412465380/fast"
+/usr/bin/make -f CMakeFiles/cmTryCompileExec412465380.dir/build.make CMakeFiles/cmTryCompileExec412465380.dir/build
+make[1]: Entering directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+/usr/bin/cmake -E cmake_progress_report /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/CMakeFiles 1
+Building C object CMakeFiles/cmTryCompileExec412465380.dir/src.c.o
+/usr/bin/cc   -DMULTIPASS_TEST_3_petsc_works_alllibraries -I/home/lukas/soft/petsc-3.7.0/arch-linux2-c-debug/include -I/home/lukas/soft/petsc-3.7.0/include    -o CMakeFiles/cmTryCompileExec412465380.dir/src.c.o   -c /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/src.c
+In file included from /home/lukas/soft/petsc-3.7.0/include/petscis.h:7:0,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscvec.h:9,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscmat.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscpc.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscksp.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscsnes.h:6,
+                 from /home/lukas/soft/petsc-3.7.0/include/petscts.h:7,
+                 from /home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp/src.c:3:
+/home/lukas/soft/petsc-3.7.0/include/petscsys.h:130:17: fatal error: mpi.h: No such file or directory
+compilation terminated.
+CMakeFiles/cmTryCompileExec412465380.dir/build.make:57: recipe for target 'CMakeFiles/cmTryCompileExec412465380.dir/src.c.o' failed
+make[1]: Leaving directory '/home/lukas/soft/permon_development/example/build/CMakeFiles/CMakeTmp'
+make[1]: *** [CMakeFiles/cmTryCompileExec412465380.dir/src.c.o] Error 1
+Makefile:117: recipe for target 'cmTryCompileExec412465380/fast' failed
+make: *** [cmTryCompileExec412465380/fast] Error 2
+
+Return value: 1
+Source file was:
+
+static const char help[] = "PETSc test program.";
+#include <petscts.h>
+int main(int argc,char *argv[]) {
+  PetscErrorCode ierr;
+  TS ts;
+
+  ierr = PetscInitialize(&argc,&argv,0,help);CHKERRQ(ierr);
+  ierr = TSCreate(PETSC_COMM_WORLD,&ts);CHKERRQ(ierr);
+  ierr = TSSetFromOptions(ts);CHKERRQ(ierr);
+  ierr = TSDestroy(&ts);CHKERRQ(ierr);
+  ierr = PetscFinalize();CHKERRQ(ierr);
+  return 0;
+}
+
