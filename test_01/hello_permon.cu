@@ -6,7 +6,7 @@
 int main( int argc, char *argv[] )
 {
 	/* initialize Petsc */
-	PetscInitialize(&argc,&argv,PETSC_NULL,PETSC_NULL);
+	FllopInitialize(&argc,&argv,PETSC_NULL);
 
 	TRY( PetscPrintf(PETSC_COMM_WORLD,"Hello from PERMON!\n") );
 	
@@ -21,7 +21,7 @@ int main( int argc, char *argv[] )
 	TRY( PetscPrintf(PETSC_COMM_WORLD,"-------------------------------\n") );
 
 	/* finalize Petsc */
-	PetscFinalize();
+	FllopFinalize();
 
 	return 0;
 }
