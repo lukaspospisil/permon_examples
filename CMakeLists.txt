@@ -30,6 +30,9 @@ include(common)
 # print information about settings
 include(printsetting)
 
+# we will store the output with results into this folder
+make_directory("results")
+
 # --------- include test cmake functions --------
 # load variables from console
 option(TEST_01 "TEST_01" OFF)
@@ -56,5 +59,6 @@ if(${TEST_02})
 	else()
 		add_executable_ext("test_02/string.cpp" "test_02")
 	endif()
+	
 endif()
 
