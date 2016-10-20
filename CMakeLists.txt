@@ -6,7 +6,7 @@
 #
 # *******************************************************************************/
 #
-# cmake -DFIND_PETSC=ON -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx ..
+# cmake -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx ..
 #
 
 project(PERMON_EXAMPLES)
@@ -33,10 +33,12 @@ include(printsetting)
 # --------- include test cmake functions --------
 # load variables from console
 option(TEST_01 "TEST_01" OFF)
+option(TEST_02 "TEST_02" OFF)
 
 # print info
 print("\nPERMON tests")
 printinfo_onoff(" TEST_01            (hello_permon)      " "${TEST_01}")
+printinfo_onoff(" TEST_02            (string)            " "${TEST_02}")
 message("\n----------------------------------------------------------\n")
 
 
@@ -48,4 +50,11 @@ if(${TEST_01})
 	endif()
 endif()
 
+if(${TEST_02})
+	if(${USE_CUDA})
+		add_executable_ext("test_02/string.cu" "test_02")
+	else()
+		add_executable_ext("test_02/string.cpp" "test_02")
+	endif()
+endif()
 
