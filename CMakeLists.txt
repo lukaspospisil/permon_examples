@@ -1,12 +1,13 @@
 #*******************************************************************************
 # PERMON examples
 # Lukas Pospisil
-# USI Lugano, 2016
-# lukas.pospisil@usi.ch
+# VSB-TU Ostrava
+# lukas.pospisil@vsb.cz
 #
 # *******************************************************************************/
 #
 # cmake -DCMAKE_CXX_COMPILER=/usr/bin/mpicxx ..
+# cmake -DCMAKE_CXX_COMPILER=/home/lukas/Soft/petsc/arch-linux2-c-debug/bin/mpicxx -DTEST_01=ON ..
 #
 
 project(PERMON_EXAMPLES)
@@ -19,7 +20,6 @@ set(EXAMPLE_ROOT "${CMAKE_SOURCE_DIR}")
 set(CMAKE_MODULE_PATH "${EXAMPLE_ROOT}/cmake/" ${CMAKE_MODULE_PATH})
 
 # default settings
-option(USE_CUDA "USE_CUDA" OFF)
 option(USE_PETSC "USE_PETSC" ON)
 option(USE_PERMON "USE_PERMON" ON)
 option(FIND_PETSC "FIND_PETSC" ON)
@@ -37,28 +37,24 @@ make_directory("results")
 # load variables from console
 option(TEST_01 "TEST_01" OFF)
 option(TEST_02 "TEST_02" OFF)
+option(TEST_03 "TEST_03" OFF)
 
 # print info
 print("\nPERMON tests")
 printinfo_onoff(" TEST_01            (hello_permon)      " "${TEST_01}")
 printinfo_onoff(" TEST_02            (string)            " "${TEST_02}")
+printinfo_onoff(" TEST_03            (polytope)          " "${TEST_03}")
 message("\n----------------------------------------------------------\n")
 
 
 if(${TEST_01})
-	if(${USE_CUDA})
-		add_executable_ext("test_01/hello_permon.cu" "test_01")
-	else()
-		add_executable_ext("test_01/hello_permon.cpp" "test_01")
-	endif()
+	add_executable_ext("test_01/hello_permon.cpp" "test_01")
 endif()
 
 if(${TEST_02})
-	if(${USE_CUDA})
-		add_executable_ext("test_02/string.cu" "test_02")
-	else()
-		add_executable_ext("test_02/string.cpp" "test_02")
-	endif()
-	
+	add_executable_ext("test_02/string.cpp" "test_02")
 endif()
 
+if(${TEST_03})
+	add_executable_ext("test_03/polytope.cpp" "test_03")
+endif()

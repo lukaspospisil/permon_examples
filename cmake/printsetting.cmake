@@ -21,9 +21,6 @@ printinfo(" - FLAGS_DEF\t\t\t" "${FLAGS_DEF}")
 printinfo(" - FLAGS_DEF_D\t\t\t" "${FLAGS_DEF_D}")
 printinfo(" - LIBRARIES_DEF\t\t" "${LIBRARIES_DEF}")
 
-# Cuda
-printsetting_cuda()
-
 # Petsc
 printsetting_petsc()
 

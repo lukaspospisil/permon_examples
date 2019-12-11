@@ -58,36 +58,11 @@ macro(ADD_EXECUTABLE_EXT filename outname)
 	# choose compiler subject to file extension
 	get_filename_component(FILE_EXT ${filename} EXT)
 
-	if(${FILE_EXT} MATCHES ".cu")
-		# --- compile with CUDA ---
-		if(NOT ${USE_CUDA})
-			message(FATAL_ERROR "${Red}Cannot compile .cu file without USE_CUDA=ON!${ColourReset}")
-		endif()
-		
-		# add executable file
-		cuda_add_executable(${outname} ${filename}
-			OPTIONS "${FLAGS_DEF_D} -arch=sm_35 --compiler-options \"${CUDA_CXX_FLAGS}\""
-			DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
-
-		# link external libraries	
-		target_link_libraries(${outname} ${LIBRARIES_DEF})
-
-		# set the name of output file
-		set_target_properties(${outname} PROPERTIES
-			OUTPUT_NAME ${outname}
-		)
-	endif()	
-
 	if(${FILE_EXT} MATCHES ".cpp")
 		# compile with g++
 
 		# add executable file
 		add_executable(${outname} ${filename})
-
-		# add dependency - build pasc library first and then this exec
-		if(${COMPILE_PASCINFERENCE})
-			add_dependencies(${outname} libpascinference)
-		endif()
 
 		# link external libraries	
 		target_link_libraries(${outname} ${LIBRARIES_DEF})
@@ -104,7 +79,6 @@ macro(ADD_EXECUTABLE_EXT filename outname)
 	
 endmacro()
 
-include(load_cuda) # CUDA
 include(load_petsc) # PETSC
 include(load_permon) # PERMON
 
