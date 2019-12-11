@@ -10,53 +10,63 @@ static char help[] = "";
 #include <sstream> /* manipulation with string streams */
 
 /* default values */
-#define PERMON_EXAMPLE_POLYTOPE_DEFAULT_M 3
+#define PERMON_EXAMPLE_BALL_DEFAULT_D 2
+#define PERMON_EXAMPLE_BALL_DEFAULT_M 100
 
-void assemble_problem(int m, Mat *A, Vec *b, Vec *lb, Mat *B, Vec *c){
+void assemble_problem(int d, int m, Mat *C, Mat *A, Vec *b, Vec *lb, Mat *B, Vec *c){
 	PetscErrorCode ierr; /* error handler */
 
+	/* b = dot */
+	ierr = VecCreate(PETSC_COMM_WORLD, b);CHKERRV(ierr);
+	ierr = VecSetSizes(*b,m,m);CHKERRV(ierr);
+	ierr = VecSetFromOptions(*b);CHKERRV(ierr);
+
+	/* C */
+	ierr = MatCreateDense(PETSC_COMM_WORLD,d,m,d,m,NULL, C);CHKERRV(ierr);
+	
+	PetscScalar *b_array;
+	ierr = VecGetArray(*b,&b_array);CHKERRV(ierr);
+
 	PetscScalar *C_data;
-	C_data = (PetscScalar *)malloc(4*m*sizeof(PetscScalar));
+	ierr = MatDenseGetArray(*C, &C_data);CHKERRV(ierr);
 
-	PetscScalar t;
-	for(int i=0;i<m;i++){
-		t = i*2*M_PI/(double)m;
-		
-		/* P points */
-		C_data[2*i+0] = -2.0 + cos(t);
-		C_data[2*i+1] = 0.0 + sin(t);
+	PetscScalar num[d];
+	PetscScalar dist;
+	PetscScalar mydot;
+	for(int j=0;j<m;j++){
+		do {
+			dist = 0;
+			for(int i=0;i<d;i++){
+				num[i] = 0.0 + (double)rand()/RAND_MAX*2.5;
+				dist += (num[i] - 1.0)*(num[i] - 1.0);
+			}
+			dist = sqrt(dist);
+		} while(dist > 1);
 
-		/* -Q points */
-		C_data[2*(m+i)+0] = - (2.0 + cos(M_PI - t));
-		C_data[2*(m+i)+1] = - (0.0 + sin(M_PI - t));
+		mydot = 0.0;
+		for(int i=0;i<d;i++){
+			C_data[d*j+i] = num[i];
+			mydot += num[i]*num[i];
+		}
+		b_array[j] = mydot;
 	}
 
-	Mat C;
-	
-	ierr = MatCreateDense(PETSC_COMM_WORLD,2,2*m,2,2*m,C_data, &C);CHKERRV(ierr);
-	ierr = PetscObjectSetName((PetscObject)C,"points");CHKERRV(ierr);
-	ierr = MatAssemblyBegin(C,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
-	ierr = MatAssemblyEnd(C,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
-	
-	/* A = 2*C'*C */
-	ierr = MatTransposeMatMult(C, C, MAT_INITIAL_MATRIX , PETSC_DEFAULT, A);CHKERRV(ierr);
-	ierr = MatScale(*A,2.0);CHKERRV(ierr);
-	ierr = MatAssemblyBegin(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
-	ierr = MatAssemblyEnd(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
-	ierr = PetscObjectSetName((PetscObject)*A,"Hessian matrix");CHKERRV(ierr);
-	
-//	ierr = MatView(*A, PETSC_VIEWER_STDOUT_WORLD);CHKERRV(ierr);
-
-	/* b = 0 */
-	ierr = VecCreate(PETSC_COMM_WORLD, b);CHKERRV(ierr);
-	ierr = VecSetSizes(*b,2*m,2*m);CHKERRV(ierr);
-	ierr = VecSetFromOptions(*b);CHKERRV(ierr);
-	ierr = VecSet(*b,0.0);CHKERRV(ierr);
+	ierr = VecRestoreArray(*b,&b_array);CHKERRV(ierr);
 	ierr = VecAssemblyBegin(*b);CHKERRV(ierr);
 	ierr = VecAssemblyEnd(*b);CHKERRV(ierr);
 	ierr = PetscObjectSetName((PetscObject)*b,"linear term");CHKERRV(ierr);
 
-//	ierr = VecView(*b, PETSC_VIEWER_STDOUT_WORLD);CHKERRV(ierr);
+	ierr = MatDenseRestoreArray(*C, &C_data);CHKERRV(ierr);
+	ierr = PetscObjectSetName((PetscObject)*C,"points");CHKERRV(ierr);
+	ierr = MatAssemblyBegin(*C,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
+	ierr = MatAssemblyEnd(*C,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
+	
+	/* A = 2*C'*C */
+	ierr = MatTransposeMatMult(*C, *C, MAT_INITIAL_MATRIX , PETSC_DEFAULT, A);CHKERRV(ierr);
+//	ierr = MatScale(*A,0.5);CHKERRV(ierr);
+	ierr = MatAssemblyBegin(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
+	ierr = MatAssemblyEnd(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
+	ierr = PetscObjectSetName((PetscObject)*A,"Hessian matrix");CHKERRV(ierr);
 
 	/* lb = 0 */
 	ierr = VecDuplicate(*b,lb);CHKERRV(ierr);
@@ -65,17 +75,13 @@ void assemble_problem(int m, Mat *A, Vec *b, Vec *lb, Mat *B, Vec *c){
 //	ierr = VecView(*lb, PETSC_VIEWER_STDOUT_WORLD);CHKERRV(ierr);
 
 	/* B = [1 1 1, 0 0 0; 0 0 0 1 1 1]; */
-	ierr = MatCreateDense(PETSC_COMM_WORLD,2,2*m,2,2*m,NULL, B);CHKERRV(ierr);
+	ierr = MatCreateDense(PETSC_COMM_WORLD,1,m,1,m,NULL, B);CHKERRV(ierr);
 	ierr = PetscObjectSetName((PetscObject)*B,"matrix of EQ");CHKERRV(ierr);
 
 	PetscScalar *B_data;
 	ierr = MatDenseGetArray(*B,&B_data);CHKERRV(ierr);
 	for(int i=0;i<m;i++){
-		B_data[2*i] = 1.0;
-		B_data[2*i+1] = 0.0;
-
-		B_data[2*(m+i)] = 0.0;
-		B_data[2*(m+i)+1] = 1.0;
+		B_data[i] = 1.0;
 	}
 	ierr = MatDenseRestoreArray(*B,&B_data);CHKERRV(ierr);
 	ierr = MatAssemblyBegin(*B,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
@@ -85,7 +91,7 @@ void assemble_problem(int m, Mat *A, Vec *b, Vec *lb, Mat *B, Vec *c){
 
 	/* c = 1 */
 	ierr = VecCreate(PETSC_COMM_WORLD, c);CHKERRV(ierr);
-	ierr = VecSetSizes(*c,2,2);CHKERRV(ierr);
+	ierr = VecSetSizes(*c,1,1);CHKERRV(ierr);
 	ierr = VecSetFromOptions(*c);CHKERRV(ierr);
 	ierr = VecSet(*c,1.0);CHKERRV(ierr);
 	ierr = VecAssemblyBegin(*c);CHKERRV(ierr);
@@ -93,9 +99,6 @@ void assemble_problem(int m, Mat *A, Vec *b, Vec *lb, Mat *B, Vec *c){
 	ierr = PetscObjectSetName((PetscObject)*c,"rhs of EQ");CHKERRV(ierr);
 
 //	ierr = VecView(*c, PETSC_VIEWER_STDOUT_WORLD);CHKERRV(ierr);
-
-	ierr = MatDestroy(&C);CHKERRV(ierr);
-	free(C_data);
 }
 
 int main( int argc,char **args )
@@ -103,33 +106,46 @@ int main( int argc,char **args )
 	/* initialize Petsc */
 	PermonInitialize(&argc,&args,(char *)0,help);
 
+	/* prepare ranodm generator */
+//	srand ( time ( NULL));
+	srand ( 0 );
+
 	/* error handler */
 	PetscErrorCode ierr;
   
 	/* say hello */
-	ierr = PetscPrintf(PETSC_COMM_WORLD,"This is POLYTOPE example\n");CHKERRQ(ierr);
+	ierr = PetscPrintf(PETSC_COMM_WORLD,"This is SMALLEST ENCLOSING BALL example\n");CHKERRQ(ierr);
 
 	/* prepare variables */
-	PetscInt m; /* number of discretisation nodes (size of the problem) */
+	PetscInt d; /* dimension of points */
+	PetscInt m; /* number of points */
 	Vec y; /* solution vector */
+	Mat C; /* matrix of points */
 	Mat A; /* Hessian matrix */
 	Vec b; /* linear term */
 	Vec lb; /* lower bound (rigid obstacle - non-penetration condition) */ 
 	Mat B; /* matrix of equality constraints */
 	Vec c; /* rhs of equality constraints */
 
+
 	/* load console parameters */
-	PetscBool set; /* the variable was provided in console parameters or not */
-	ierr = PetscOptionsGetInt(NULL,NULL,"-m",&m,&set);CHKERRQ(ierr);
-	if(!set) m = PERMON_EXAMPLE_POLYTOPE_DEFAULT_M;
+	PetscBool set_d; /* the variable was provided in console parameters or not */
+	ierr = PetscOptionsGetInt(NULL,NULL,"-d",&d,&set_d);CHKERRQ(ierr);
+	if(!set_d) d = PERMON_EXAMPLE_BALL_DEFAULT_D;
+
+	PetscBool set_m; /* the variable was provided in console parameters or not */
+	ierr = PetscOptionsGetInt(NULL,NULL,"-m",&m,&set_m);CHKERRQ(ierr);
+	if(!set_m) m = PERMON_EXAMPLE_BALL_DEFAULT_M;
 	
 	/* print parameters loaded from console */
+	ierr = PetscPrintf(PETSC_COMM_WORLD," d                    = %d\n", d);CHKERRQ(ierr);
 	ierr = PetscPrintf(PETSC_COMM_WORLD," m                    = %d\n", m);CHKERRQ(ierr);
 
 	/* assemble problem */
-	assemble_problem(m, &A, &b, &lb, &B, &c);
+	assemble_problem(d, m, &C, &A, &b, &lb, &B, &c);
 
 	/* test */
+	ierr = MatView(C, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = MatView(A, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = VecView(b, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = VecView(lb, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
@@ -168,24 +184,49 @@ int main( int argc,char **args )
 	
 //	ierr = VecView(y, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 
-	/* compute the distance (function value) */
-	Vec Ay;
-	ierr = VecDuplicate(y,&Ay);CHKERRQ(ierr);
-	ierr = MatMult(A,y,Ay);
-	PetscScalar my_distance;
-	ierr = VecDot(y,Ay,&my_distance);CHKERRQ(ierr);
-	ierr = PetscPrintf(PETSC_COMM_WORLD," Final distance       = %f (should be %f)\n",0.25*my_distance, 2.0);CHKERRQ(ierr);
-	ierr = VecDestroy(&Ay);CHKERRQ(ierr);
+	/* compute the center */
+	Vec p;
+	ierr = VecCreate(PETSC_COMM_WORLD, &p);CHKERRQ(ierr);
+	ierr = VecSetSizes(p,d,d);CHKERRQ(ierr);
+	ierr = VecSetFromOptions(p);CHKERRQ(ierr);
+	ierr = VecAssemblyBegin(p);CHKERRQ(ierr);
+	ierr = VecAssemblyEnd(p);CHKERRQ(ierr);
+	ierr = PetscObjectSetName((PetscObject)p,"center");CHKERRQ(ierr);
+	
+	ierr = MatMult(C,y,p);
 
-	/* eigen value test */
-	PetscScalar lambda;
-	ierr = MatGetMaxEigenvalue(A, NULL, &lambda, 1e-10, 1e5);CHKERRQ(ierr);
-	ierr = PetscPrintf(PETSC_COMM_WORLD," Max eigenvalue test  = %f (should be %f)\n",lambda/(2.0*(double)m), 9.0);CHKERRQ(ierr);
+	ierr = PetscPrintf(PETSC_COMM_WORLD," center               = [");CHKERRQ(ierr);
+	PetscScalar *p_array;
+	ierr = VecGetArray(p,&p_array);CHKERRQ(ierr);
+	for(int i=0;i<d;i++){
+		ierr = PetscPrintf(PETSC_COMM_WORLD,"%f", p_array[i]);CHKERRQ(ierr);
+		if(i < d-1){
+			ierr = PetscPrintf(PETSC_COMM_WORLD,", ");CHKERRQ(ierr);
+		}
+	}	
+	ierr = VecRestoreArray(p,&p_array);CHKERRQ(ierr);
+	ierr = PetscPrintf(PETSC_COMM_WORLD,"]\n");CHKERRQ(ierr);
+	
+	
+	PetscScalar yAy, by;
+	ierr = VecDot(p,p,&yAy);CHKERRQ(ierr);
+	ierr = VecDot(b,y,&by);CHKERRQ(ierr);
+	
+	PetscScalar r = 0.5*yAy - by;
+	if(r < 0){
+		r = sqrt(-r);
+	} else {
+		r = sqrt(r);
+	}
+	ierr = PetscPrintf(PETSC_COMM_WORLD," radius           = %f (should be %f)\n",r, 1.0);CHKERRQ(ierr);
+
 
 	/* destroy the mess */
 	ierr = QPDestroy(&qp);CHKERRQ(ierr);
 	ierr = QPSDestroy(&qps);CHKERRQ(ierr);
-	
+
+	ierr = VecDestroy(&p);CHKERRQ(ierr);
+	ierr = MatDestroy(&C);CHKERRQ(ierr);
 	ierr = VecDestroy(&y);CHKERRQ(ierr);
 	ierr = MatDestroy(&A);CHKERRQ(ierr);
 	ierr = VecDestroy(&b);CHKERRQ(ierr);

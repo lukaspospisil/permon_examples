@@ -38,12 +38,14 @@ make_directory("results")
 option(TEST_01 "TEST_01" OFF)
 option(TEST_02 "TEST_02" OFF)
 option(TEST_03 "TEST_03" OFF)
+option(TEST_04 "TEST_04" OFF)
 
 # print info
 print("\nPERMON tests")
-printinfo_onoff(" TEST_01            (hello_permon)      " "${TEST_01}")
-printinfo_onoff(" TEST_02            (string)            " "${TEST_02}")
-printinfo_onoff(" TEST_03            (polytope)          " "${TEST_03}")
+printinfo_onoff(" TEST_01  (hello_permon)      " "${TEST_01}")
+printinfo_onoff(" TEST_02  (string)            " "${TEST_02}")
+printinfo_onoff(" TEST_03  (polytope)          " "${TEST_03}")
+printinfo_onoff(" TEST_04  (ball)              " "${TEST_04}")
 message("\n----------------------------------------------------------\n")
 
 
@@ -58,3 +60,8 @@ endif()
 if(${TEST_03})
 	add_executable_ext("test_03/polytope.cpp" "test_03")
 endif()
+
+if(${TEST_04})
+	add_executable_ext("test_04/ball.cpp" "test_04")
+endif()
+
