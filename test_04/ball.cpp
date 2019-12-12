@@ -63,7 +63,7 @@ void assemble_problem(int d, int m, Mat *C, Mat *A, Vec *b, Vec *lb, Mat *B, Vec
 	
 	/* A = 2*C'*C */
 	ierr = MatTransposeMatMult(*C, *C, MAT_INITIAL_MATRIX , PETSC_DEFAULT, A);CHKERRV(ierr);
-//	ierr = MatScale(*A,0.5);CHKERRV(ierr);
+	ierr = MatScale(*A,2.0);CHKERRV(ierr);
 	ierr = MatAssemblyBegin(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
 	ierr = MatAssemblyEnd(*A,MAT_FINAL_ASSEMBLY);CHKERRV(ierr);
 	ierr = PetscObjectSetName((PetscObject)*A,"Hessian matrix");CHKERRV(ierr);
@@ -145,7 +145,7 @@ int main( int argc,char **args )
 	assemble_problem(d, m, &C, &A, &b, &lb, &B, &c);
 
 	/* test */
-	ierr = MatView(C, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
+//	ierr = MatView(C, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = MatView(A, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = VecView(b, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
 //	ierr = VecView(lb, PETSC_VIEWER_STDOUT_WORLD);CHKERRQ(ierr);
@@ -205,20 +205,19 @@ int main( int argc,char **args )
 		}
 	}	
 	ierr = VecRestoreArray(p,&p_array);CHKERRQ(ierr);
-	ierr = PetscPrintf(PETSC_COMM_WORLD,"]\n");CHKERRQ(ierr);
-	
+	ierr = PetscPrintf(PETSC_COMM_WORLD,"] (should be 1)\n");CHKERRQ(ierr);
 	
 	PetscScalar yAy, by;
 	ierr = VecDot(p,p,&yAy);CHKERRQ(ierr);
 	ierr = VecDot(b,y,&by);CHKERRQ(ierr);
 	
-	PetscScalar r = 0.5*yAy - by;
+	PetscScalar r = yAy - by;
 	if(r < 0){
 		r = sqrt(-r);
 	} else {
 		r = sqrt(r);
 	}
-	ierr = PetscPrintf(PETSC_COMM_WORLD," radius           = %f (should be %f)\n",r, 1.0);CHKERRQ(ierr);
+	ierr = PetscPrintf(PETSC_COMM_WORLD," radius               = %f (should be %f)\n",r, 1.0);CHKERRQ(ierr);
 
 
 	/* destroy the mess */

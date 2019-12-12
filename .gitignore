@@ -30,3 +30,7 @@
 
 build
 
+#latex
+*.aux
+*.log
+*-eps-converted-to.pdf
